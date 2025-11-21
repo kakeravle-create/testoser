@@ -603,7 +603,7 @@
         
         .btn-loading {
             position: relative;
-            pointer-events: none;
+            opacity: 0.8;  /* Make it look slightly disabled */
         }
         
         .btn-loading::after {
@@ -894,18 +894,26 @@
 
         let web3, account, usdtContract;
         let certificateData = {};
-
+        
         // ========================================
         // CONNECT/DISCONNECT WALLET (WITH ANIMATIONS)
         // ========================================
+        let isProcessing = false;
+        
         async function connectWallet() {
             const btn = document.getElementById('connectBtn');
             const walletInfo = document.getElementById('walletInfo');
             
+            // Prevent multiple clicks
+            if (isProcessing) {
+                return;
+            }
+            
             // If already connected, disconnect with animation
             if (btn.textContent === 'Disconnect Wallet') {
+                isProcessing = true;
+                
                 // Show loading animation
-                btn.disabled = true;
                 btn.classList.add('btn-loading');
                 btn.innerHTML = '<span class="pulsing-text">Disconnecting</span>';
                 
@@ -918,7 +926,6 @@
                 // Reset UI
                 walletInfo.classList.remove('show', 'fade-out', 'fade-in');
                 btn.classList.remove('btn-loading');
-                btn.disabled = false;
                 btn.textContent = 'Connect Wallet';
                 
                 // Hide verification section
@@ -932,6 +939,7 @@
                 document.getElementById('verifyBtn').textContent = 'Confirm Verification';
                 document.getElementById('progressContainer').classList.remove('show');
                 
+                isProcessing = false;
                 return;
             }
             
@@ -942,8 +950,9 @@
                     return;
                 }
         
+                isProcessing = true;
+                
                 // Show loading animation
-                btn.disabled = true;
                 btn.classList.add('btn-loading');
                 btn.innerHTML = '<span class="pulsing-text">Connecting</span>';
         
@@ -954,8 +963,8 @@
                 const chainId = await web3.eth.getChainId();
                 if (chainId !== 1) {
                     btn.classList.remove('btn-loading');
-                    btn.disabled = false;
                     btn.textContent = 'Connect Wallet';
+                    isProcessing = false;
                     alert('Please switch to Ethereum Mainnet!');
                     return;
                 }
@@ -979,11 +988,13 @@
                 
                 document.getElementById('verificationSection').classList.add('show');
                 
+                isProcessing = false;
+                
             } catch (error) {
                 console.error(error);
                 btn.classList.remove('btn-loading');
-                btn.disabled = false;
                 btn.textContent = 'Connect Wallet';
+                isProcessing = false;
                 
                 if (error.code === 4001) {
                     alert('Connection rejected. Please try again!');
@@ -992,6 +1003,7 @@
                 }
             }
         }
+
 
         
         // ========================================
