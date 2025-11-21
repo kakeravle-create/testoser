@@ -593,7 +593,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔐 Wallet Verification3</h1>
+        <h1>🔐 Wallet Verification4</h1>
         
         <div class="connect-section">
             <div class="connect-row">
@@ -1095,14 +1095,28 @@
             }, 300);
         }
 
+
         // ========================================
         // VIEW CERTIFICATE AGAIN
         // ========================================
         function viewCertificate() {
             document.getElementById('certificateModal').classList.add('show');
         }
-
-
+        
+        // ========================================
+        // CLOSE CERTIFICATE
+        // ========================================
+        function closeCertificate() {
+            document.getElementById('certificateModal').classList.remove('show');
+            
+            // Show Analysis Complete section and View Certificate button
+            document.getElementById('analysisComplete').classList.add('show');
+            document.getElementById('downloadBtn').style.display = 'flex';
+            
+            // Hide the verify button
+            document.getElementById('verifyBtn').style.display = 'none';
+        }
+        
         // ========================================
         // DOWNLOAD CERTIFICATE JSON
         // ========================================
@@ -1122,6 +1136,7 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
+
     </script>
 </body>
 </html>
