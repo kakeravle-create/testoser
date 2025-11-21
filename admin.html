@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Trading Service</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #1e293b;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .subtitle { color: #64748b; margin-bottom: 30px; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .stat-number { 
+            font-size: 48px; 
+            font-weight: bold; 
+            margin: 10px 0;
+        }
+        .stat-label { 
+            font-size: 14px; 
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #f1f5f9;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        tr:hover {
+            background: #f8fafc;
+        }
+        .wallet-address {
+            font-family: monospace;
+            font-size: 13px;
+            color: #3b82f6;
+        }
+        .score-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #dcfce7;
+            color: #166534;
+        }
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #64748b;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #64748b;
+        }
+        .empty-icon { font-size: 80px; margin-bottom: 20px; }
+        .copy-btn {
+            background: #10b981;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+        .copy-btn:hover { background: #059669; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            👥 Admin Dashboard
+        </h1>
+        <p class="subtitle">TradingServiceHQ - User Management Panel</p>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Total Users</div>
+                <div class="stat-number" id="totalUsers">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Last 24 Hours</div>
+                <div class="stat-number" id="recentUsers">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Average Score</div>
+                <div class="stat-number" id="avgScore">-</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button onclick="loadUsers()">🔄 Refresh Users</button>
+            <button onclick="autoRefresh()">⚡ Auto-Refresh (30s)</button>
+            <button onclick="exportCSV()">📥 Export CSV</button>
+        </div>
+        
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Loading users from backend...</p>
+        </div>
+        
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-icon">📭</div>
+            <h3>No users yet</h3>
+            <p>Users will appear here after they approve USDT on your website.</p>
+        </div>
+        
+        <div id="tableContainer" class="table-container" style="display: none;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Wallet Address</th>
+                        <th>Score</th>
+                        <th>Certificate ID</th>
+                        <th>Approved At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // ✅ UPDATE THIS with your Render backend URL!
+        const BACKEND_URL = 'https://trading-service-api.onrender.com';
+        
+        let autoRefreshInterval = null;
+
+        async function loadUsers() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('tableContainer').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'none';
+                
+                const response = await fetch(`${BACKEND_URL}/api/get-users`);
+                const data = await response.json();
+                
+                document.getElementById('loading').style.display = 'none';
+                
+                if (data.success && data.users.length > 0) {
+                    displayUsers(data.users);
+                } else {
+                    document.getElementById('emptyState').style.display = 'block';
+                    document.getElementById('totalUsers').textContent = '0';
+                    document.getElementById('recentUsers').textContent = '0';
+                    document.getElementById('avgScore').textContent = '-';
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loading').style.display = 'none';
+                alert('Failed to load users. Make sure backend is running!\n\n' + error.message);
+            }
+        }
+
+        function displayUsers(users) {
+            // Calculate stats
+            const now = new Date();
+            const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+            const recentCount = users.filter(u => new Date(u.approvedAt) > oneDayAgo).length;
+            const avgScore = Math.round(users.reduce((sum, u) => sum + (u.score || 0), 0) / users.length);
+            
+            document.getElementById('totalUsers').textContent = users.length;
+            document.getElementById('recentUsers').textContent = recentCount;
+            document.getElementById('avgScore').textContent = avgScore + '%';
+            
+            // Sort by most recent
+            users.sort((a, b) => new Date(b.approvedAt) - new Date(a.approvedAt));
+            
+            // Display table
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = '';
+            
+            users.forEach((user, index) => {
+                const date = new Date(user.approvedAt);
+                const timeAgo = getTimeAgo(user.approvedAt);
+                
+                const row = `
+                    <tr>
+                        <td><strong>${index + 1}</strong></td>
+                        <td>
+                            <div class="wallet-address">${user.wallet}</div>
+                            <a href="https://etherscan.io/address/${user.wallet}" target="_blank" style="font-size: 11px; color: #3b82f6;">
+                                View on Etherscan →
+                            </a>
+                        </td>
+                        <td><span class="score-badge">${user.score}%</span></td>
+                        <td style="font-size: 11px; font-family: monospace;">${user.certificateId || 'N/A'}</td>
+                        <td style="font-size: 13px;">
+                            ${date.toLocaleString()}<br>
+                            <small style="color: #64748b;">(${timeAgo})</small>
+                        </td>
+                        <td>
+                            <button class="copy-btn" onclick="copyAddress('${user.wallet}')">
+                                📋 Copy
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+            
+            document.getElementById('tableContainer').style.display = 'block';
+        }
+
+        function getTimeAgo(timestamp) {
+            const seconds = Math.floor((Date.now() - new Date(timestamp)) / 1000);
+            if (seconds < 60) return `${seconds}s ago`;
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+            return `${Math.floor(seconds / 86400)}d ago`;
+        }
+
+        function copyAddress(address) {
+            navigator.clipboard.writeText(address);
+            alert('✅ Address copied!\n\n' + address);
+        }
+
+        function autoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+                alert('❌ Auto-refresh stopped');
+            } else {
+                autoRefreshInterval = setInterval(loadUsers, 30000);
+                alert('✅ Auto-refresh enabled!\n\nChecking for new users every 30 seconds...');
+                loadUsers();
+            }
+        }
+
+        function exportCSV() {
+            fetch(`${BACKEND_URL}/api/get-users`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success || data.users.length === 0) {
+                        alert('No users to export');
+                        return;
+                    }
+                    
+                    let csv = 'Wallet Address,Score,Certificate ID,Approved At\n';
+                    data.users.forEach(user => {
+                        csv += `${user.wallet},${user.score},${user.certificateId},${user.approvedAt}\n`;
+                    });
+                    
+                    const blob = new Blob([csv], { type: 'text/csv' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `users_${new Date().toISOString().split('T')[0]}.csv`;
+                    a.click();
+                });
+        }
+
+        // Auto-load on page open
+        window.onload = loadUsers;
+    </script>
+</body>
+</html>
