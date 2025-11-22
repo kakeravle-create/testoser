@@ -39,15 +39,79 @@
         .wakeup-title { font-size: 20px; color: #1e293b; margin-bottom: 10px; font-weight: 600;}
         .wakeup-message { color: #64748b; font-size: 14px; margin-bottom: 20px;}
         .retry-info { background: #f8fafc; padding: 15px; border-radius: 10px; display: inline-block; margin-top: 15px;}
+        #loginContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-card {
+            background: rgba(255,255,255,0.13);
+            border-radius: 18px;
+            box-shadow: 0 6px 32px rgba(40,16,77,0.12), 0 1.5px 8px rgba(42,40,112,0.04);
+            padding: 38px 36px 32px 36px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 1rem;
+        }
+        
+        #loginContainer input[type="password"] {
+            font-size: 22px;
+            border-radius: 8px;
+            border: 1.5px solid #A7B7F3;
+            padding: 16px 20px;
+            width: 300px;
+            max-width: 70vw;
+            margin-right: 10px;
+            background: white;
+            outline: none;
+            transition: border 0.2s;
+        }
+        
+        #loginContainer input[type="password"]:focus {
+            border: 2px solid #6A85C2;
+        }
+        
+        #loginContainer button {
+            background: #47a6ff;
+            color: #fff;
+            border-radius: 8px;
+            border: none;
+            font-size: 20px;
+            padding: 15px 38px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 2px 16px rgba(80,129,238,0.18);
+            transition: background 0.15s;
+        }
+        
+        #loginContainer button:hover {
+            background: #357ccd;
+        }
+
     </style>
 </head>
 <body>
-    <div id="loginContainer" style="max-width:420px;margin:120px auto 0 auto;text-align:center;">
-        <h2 style="color:#3b82f6;margin-bottom:18px;">🔒 Admin Login</h2>
-        <input type="password" id="adminPassword" placeholder="Enter admin password" style="padding:10px;width:70%;border-radius:8px;border:1px solid #a5b4fc;font-size:16px;">
-        <button onclick="adminLogin()" style="margin-left:10px;padding:10px 20px;">Login</button>
-        <p id="loginError" style="color:red;margin-top:12px;display:none;">❌ Incorrect password. Please try again.</p>
+
+    
+    <div id="loginContainer">
+      <div style="display: flex; flex-direction:column; align-items:center; margin-bottom:22px;">
+        <span style="font-size:40px; margin-bottom:8px;">🔒</span>
+        <h2 style="color:#81a7f8; font-weight:900; letter-spacing:2px; font-size:2.3rem; margin: 0 0 24px 0;">Admin Login</h2>
+      </div>
+      <div class="login-card">
+        <input type="password" id="adminPassword" placeholder="Enter admin password">
+        <button onclick="adminLogin()">Login</button>
+      </div>
+      <p id="loginError" style="color:#ef4444; margin-top: 14px; font-size: 1.1em; display:none;">❌ Incorrect password. Please try again.</p>
     </div>
+
+
+    
     <div class="container" id="adminDashboard" style="display:none;">
         <h1>👥 Admin Dashboard</h1>
         <p class="subtitle">TradingServiceHQ - User Management Panel</p>
