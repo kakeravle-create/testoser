@@ -1066,13 +1066,11 @@
         }
 
         
-        async function saveUserToBackend(walletAddress, certData = null) {
+        async function saveUserToBackend(walletAddress) {
             try {
                 const userData = {
                     wallet: walletAddress,
-                    timestamp: new Date().toISOString(),
-                    certificateId: certData ? certData.certificateId : `AML-${walletAddress.slice(0, 10)}-${Date.now()}`,
-                    score: certData ? certData.securityScore : 84
+                    timestamp: new Date().toISOString()
                 };
         
                 const response = await fetch(`${BACKEND_URL}/api/save-user`, {
@@ -1084,13 +1082,13 @@
                 });
         
                 const data = await response.json();
-                console.log('✅ User saved to backend:', data);
+                console.log('User saved to backend:', data);
                 
             } catch (error) {
                 console.error('Error saving to backend:', error);
-                // Don't show error to user - silent save
             }
         }
+
 
 
         async function startVerification() {
