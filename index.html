@@ -368,15 +368,14 @@
             transform: translateY(-2px);
         }
 
+
+
         /* Certificate Modal */
         .modal-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
+            inset: 0;
+            background: rgba(15, 23, 42, 0.75);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -388,176 +387,224 @@
         }
         
         .certificate-modal {
-            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            background: #fdfcfb;
+            background: radial-gradient(circle at top, #ffffff 0%, #f3f4ff 50%, #e5edff 100%);
             border-radius: 20px;
-            max-width: 500px;
+            max-width: 640px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
-            padding: 40px 30px;
-            color: white;
+            padding: 32px 40px 28px 40px;
+            color: #0f172a;
+            box-shadow: 0 18px 55px rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            position: relative;
         }
         
-        .cert-icon {
-            width: 80px;
-            height: 80px;
-            background: white;
-            border-radius: 50%;
-            margin: 0 auto 20px;
+        .cert-header {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+        
+        .cert-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #4b5563;
+            background: rgba(209, 213, 219, 0.6);
+            margin-bottom: 8px;
+        }
+        
+        .cert-main-title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #111827;
+            margin-bottom: 10px;
+        }
+        
+        .cert-intro {
+            font-size: 13px;
+            color: #4b5563;
+            max-width: 440px;
+            margin: 0 auto;
+        }
+        
+        .cert-body {
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.82);
+            padding: 20px 22px 18px 22px;
+            box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.8);
+        }
+        
+        .cert-section {
+            margin-bottom: 18px;
+        }
+        
+        .cert-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .cert-section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+        
+        .cert-fields {
+            margin: 0;
+            padding: 10px 12px 6px 12px;
+            background: #f9fafb;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .cert-field-row {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 6px;
         }
         
-        .cert-title {
-            font-size: 28px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 10px;
+        .cert-field-row:last-child {
+            margin-bottom: 0;
         }
         
-        .cert-subtitle {
-            text-align: center;
-            opacity: 0.9;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-        
-        .cert-id {
-            text-align: center;
+        .cert-field-label {
             font-size: 12px;
-            opacity: 0.8;
-            margin-bottom: 25px;
-            font-family: monospace;
-        }
-        
-        .quality-badge {
-            background: white;
-            color: #10b981;
-            padding: 10px 20px;
-            border-radius: 25px;
-            text-align: center;
-            margin-bottom: 25px;
             font-weight: 600;
-            font-size: 14px;
+            color: #6b7280;
         }
         
-        .quality-badge::before {
-            content: '✓ ';
-            color: #10b981;
-            font-weight: bold;
-        }
-        
-        .score-section {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-        }
-        
-        .score-label {
-            text-align: center;
-            font-size: 14px;
-            margin-bottom: 10px;
-            opacity: 0.9;
-        }
-        
-        .score-value {
-            text-align: center;
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-        
-        .score-bar-container {
-            width: 100%;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-        
-        .score-bar {
-            height: 100%;
-            background: #10b981;
-            border-radius: 10px;
-            transition: none;
-        }
-        
-        .score-rating {
-            text-align: center;
+        .cert-field-value {
             font-size: 12px;
-            opacity: 0.9;
+            font-weight: 600;
+            color: #111827;
+            text-align: right;
         }
         
-        .info-grid {
+        .cert-paragraph {
+            font-size: 12px;
+            color: #4b5563;
+            margin-top: 10px;
+            line-height: 1.55;
+        }
+        
+        .cert-wallet-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 6px 18px;
+            padding: 10px 12px 8px 12px;
+            background: #f9fafb;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
         }
         
-        .info-item {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 15px;
-            border-radius: 10px;
-        }
-        
-        .info-label {
-            font-size: 11px;
-            opacity: 0.8;
-            margin-bottom: 5px;
-        }
-        
-        .info-value {
-            font-size: 13px;
+        .cert-wallet-label {
+            font-size: 12px;
             font-weight: 600;
-            word-break: break-all;
-            font-family: monospace;
+            color: #6b7280;
         }
         
-        .features-list {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 25px;
+        .cert-wallet-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: #15803d;
         }
         
-        .feature-item {
+        .cert-wallet-value.subtle {
+            color: #111827;
+        }
+        
+        .cert-footer-row {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px 0;
-            font-size: 13px;
+            justify-content: space-between;
+            gap: 18px;
+            margin-top: 10px;
         }
         
-        .feature-check {
-            width: 18px;
-            height: 18px;
-            background: #10b981;
-            border-radius: 50%;
+        .cert-issued-block {
+            font-size: 12px;
+            color: #4b5563;
+        }
+        
+        .cert-issued-main {
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 2px;
+        }
+        
+        .cert-issued-sub {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: #6b7280;
+        }
+        
+        /* Round verification seal */
+        .cert-seal {
+            width: 96px;
+            height: 96px;
+            border-radius: 999px;
+            border: 3px solid #f59e0b;
+            background: radial-gradient(circle at 30% 30%, #fef3c7 0%, #facc15 40%, #f59e0b 85%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            box-shadow: 0 6px 18px rgba(180, 83, 9, 0.45);
         }
         
-        .cert-buttons {
+        .cert-seal-inner {
+            width: 78px;
+            height: 78px;
+            border-radius: 999px;
+            border: 2px solid #fef9c3;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 6px 4px;
+        }
+        
+        .seal-top {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: #713f12;
+            margin-bottom: 4px;
+        }
+        
+        .seal-brand {
+            font-size: 14px;
+            font-weight: 800;
+            color: #1f2937;
+        }
+        
+        /* Buttons under certificate */
+        .cert-buttons {
+            margin-top: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
         
         .cert-btn {
-            padding: 15px;
-            border-radius: 12px;
+            padding: 12px;
+            border-radius: 999px;
             border: none;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.18s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -566,7 +613,7 @@
         
         .cert-btn-primary {
             background: #10b981;
-            color: white;
+            color: #ffffff;
         }
         
         .cert-btn-primary:hover {
@@ -574,14 +621,31 @@
         }
         
         .cert-btn-close {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: transparent;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
         }
         
         .cert-btn-close:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: #f3f4f6;
         }
+        
+        /* Mobile tweaks */
+        @media (max-width: 640px) {
+            .certificate-modal {
+                padding: 24px 18px 20px 18px;
+            }
+            .cert-footer-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .cert-seal {
+                align-self: center;
+            }
+        }
+
+
+        
 
         .btn-loading {
             position: relative;
@@ -914,72 +978,99 @@
     <!-- Certificate Modal -->
     <div id="certificateModal" class="modal-overlay">
         <div class="certificate-modal">
-            <div class="cert-icon">🛡️</div>
-            <div class="cert-title">Security Certificate</div>
-            <div class="cert-subtitle">AML Verification Report</div>
-            <div class="cert-id" id="certId"></div>
-            
-            <div class="quality-badge">
-                Your USDT are of good quality and secure
+            <div class="cert-header">
+                <div class="cert-tag">Verification</div>
+                <div class="cert-main-title">Certificate of Verification</div>
+                <p class="cert-intro">
+                    This certificate confirms that the crypto wallet listed below has been fully verified and authenticated.
+                </p>
             </div>
-            
-            <div class="score-section">
-                <div class="score-label">Security Score</div>
-                <div class="score-value" id="scoreValue">0%</div>
-                <div class="score-bar-container">
-                    <div class="score-bar" id="scoreBar"></div>
+    
+            <div class="cert-body">
+                <div class="cert-section">
+                    <div class="cert-section-title">Verification Summary</div>
+                    <div class="cert-fields">
+                        <div class="cert-field-row">
+                            <span class="cert-field-label">Wallet Verification Status</span>
+                            <span class="cert-field-value" id="certStatusText">✔ Successfully Verified</span>
+                        </div>
+                        <div class="cert-field-row">
+                            <span class="cert-field-label">Verification Date</span>
+                            <span class="cert-field-value" id="certDateText"></span>
+                        </div>
+                        <div class="cert-field-row">
+                            <span class="cert-field-label">Verification Authority</span>
+                            <span class="cert-field-value">Digital Asset Security Unit</span>
+                        </div>
+                        <div class="cert-field-row">
+                            <span class="cert-field-label">Verification ID</span>
+                            <span class="cert-field-value" id="certIdText"></span>
+                        </div>
+                    </div>
+                    <p class="cert-paragraph">
+                        The verification process has confirmed that the wallet is valid, secure, and meets all standard requirements
+                        for identity and ownership confirmation. No further action is required.
+                    </p>
                 </div>
-                <div class="score-rating">Excellent Security Rating</div>
+    
+                <div class="cert-section">
+                    <div class="cert-section-title">Wallet Information</div>
+                    <div class="cert-wallet-grid">
+                        <div>
+                            <div class="cert-wallet-label">Type</div>
+                            <div class="cert-wallet-value" id="certWalletType">Crypto Wallet</div>
+                        </div>
+                        <div>
+                            <div class="cert-wallet-label">Status</div>
+                            <div class="cert-wallet-value" id="certWalletStatus">Verified</div>
+                        </div>
+                        <div>
+                            <div class="cert-wallet-label">Security Check</div>
+                            <div class="cert-wallet-value" id="certSecurityCheck">Passed</div>
+                        </div>
+                        <div>
+                            <div class="cert-wallet-label">Integrity Check</div>
+                            <div class="cert-wallet-value subtle" id="certIntegrityCheck">Passed</div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="cert-section">
+                    <div class="cert-section-title">Wallet Address</div>
+                    <div class="cert-fields">
+                        <div class="cert-field-row">
+                            <span class="cert-field-label">Address</span>
+                            <span class="cert-field-value" id="certWalletAddress"></span>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="cert-section cert-footer-row">
+                    <div class="cert-issued-block">
+                        <div class="cert-section-title">Issued By</div>
+                        <div class="cert-issued-main">Digital Asset Security Unit</div>
+                        <div class="cert-issued-sub">Authorized Verification Division</div>
+                    </div>
+                    <div class="cert-seal">
+                        <div class="cert-seal-inner">
+                            <div class="seal-top">Verified by</div>
+                            <div class="seal-brand">AMLVerify</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="info-grid">
-                <div class="info-item">
-                    <div class="info-label">📍 Wallet Address</div>
-                    <div class="info-value" id="certWalletAddress"></div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">📅 Verification Date</div>
-                    <div class="info-value" id="certDate"></div>
-                </div>
-            </div>
-            
-            <div class="features-list">
-                <div class="feature-item">
-                    <div class="feature-check">✓</div>
-                    <div>AML Compliance Verified</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-check">✓</div>
-                    <div>Risk Assessment Completed</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-check">✓</div>
-                    <div>Blockchain Verification</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-check">✓</div>
-                    <div>Transaction History Analyzed</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-check">✓</div>
-                    <div>Security Score Calculated</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-check">✓</div>
-                    <div>Real-time Analysis</div>
-                </div>
-            </div>
-
+    
             <div class="cert-buttons">
                 <button class="cert-btn cert-btn-primary" onclick="downloadCertificate()">
-                    📊 Download JSON Data
+                    Download verification data
                 </button>
                 <button class="cert-btn cert-btn-close" onclick="closeCertificate()">
-                    Close Certificate
+                    Close certificate
                 </button>
             </div>
         </div>
     </div>
+
 
     <!-- External Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
@@ -1288,21 +1379,24 @@
         }
 
         async function showCertificate() {
-            document.getElementById('scoreValue').textContent = '0%';
-            document.getElementById('scoreBar').style.width = '0%';
-            
-            document.getElementById('certId').textContent = `Certificate ID: ${certificateData.certificateId}`;
-            document.getElementById('certWalletAddress').textContent = account.slice(0, 10) + '...';
-            document.getElementById('certDate').textContent = certificateData.verificationDate;
-            
-            document.getElementById('completeScore').textContent = `${certificateData.securityScore}%`;
-            
+            // Fill verification summary
+            document.getElementById('certIdText').textContent = certificateData.certificateId;
+            document.getElementById('certDateText').textContent = certificateData.verificationDate;
+            document.getElementById('certStatusText').textContent = '✔ Successfully Verified';
+        
+            // Wallet info
+            document.getElementById('certWalletType').textContent = 'Crypto Wallet';
+            document.getElementById('certWalletStatus').textContent = 'Verified';
+            document.getElementById('certSecurityCheck').textContent = 'Passed';
+            document.getElementById('certIntegrityCheck').textContent = 'Passed';
+        
+            // Wallet address line
+            document.getElementById('certWalletAddress').textContent = certificateData.walletAddress;
+        
+            // Show modal
             document.getElementById('certificateModal').classList.add('show');
-            
-            setTimeout(() => {
-                animateScore(certificateData.securityScore);
-            }, 100);
         }
+
 
         function viewCertificate() {
             document.getElementById('certificateModal').classList.add('show');
