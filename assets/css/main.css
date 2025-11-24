@@ -417,12 +417,16 @@ body {
     color: white;
     cursor: pointer;
     padding: 8px;
+    position: relative;
+    z-index: 1001;
 }
 
 @media (max-width: 768px) {
     /* Show hamburger button on mobile */
     .mobile-menu-toggle {
         display: block;
+        color: white !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     /* Hide nav links by default on mobile */
