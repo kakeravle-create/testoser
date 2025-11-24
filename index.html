@@ -697,7 +697,13 @@
     <!-- Navigation -->
     <nav class="navbar">
         <a href="/" class="logo">🛡️ CertifyMyCrypto</a>
-        <ul class="nav-links">
+        
+        <!-- Add this hamburger button -->
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+            ☰
+        </button>
+        
+        <ul class="nav-links" id="navLinks">
             <li><a href="/">Home</a></li>
             <li><a href="/how-it-works">How It Works</a></li>
             <li><a href="/faq">FAQ</a></li>
@@ -705,10 +711,7 @@
             <li><a href="/#verify" class="nav-cta">Verify Now</a></li>
         </ul>
     </nav>
-
-
-
-
+    
 
     <!-- Hero Section -->
     <section class="hero">
