@@ -403,3 +403,112 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
+
+
+/* ====================================
+   MOBILE NAVIGATION (Hamburger Menu)
+   ==================================== */
+
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+}
+
+@media (max-width: 768px) {
+    /* Show hamburger button on mobile */
+    .mobile-menu-toggle {
+        display: block;
+    }
+
+    /* Hide nav links by default on mobile */
+    .nav-links {
+        position: fixed;
+        top: 70px;
+        right: -100%;
+        width: 70%;
+        max-width: 300px;
+        height: calc(100vh - 70px);
+        background: #1e293b;
+        flex-direction: column;
+        padding: 30px 0;
+        transition: right 0.3s ease;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+        z-index: 999;
+    }
+
+    /* Show menu when active */
+    .nav-links.active {
+        right: 0;
+    }
+
+    .nav-links li {
+        margin: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+    .nav-links li a {
+        display: block;
+        padding: 15px 20px;
+        width: 100%;
+    }
+
+    .nav-cta {
+        margin: 10px 20px !important;
+        display: block !important;
+        text-align: center !important;
+    }
+}
+
+/* ====================================
+   IMPROVED MOBILE FOOTER
+   ==================================== */
+
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr 1fr; /* 2 columns on mobile */
+        gap: 30px;
+        text-align: left;
+    }
+
+    .footer-section {
+        padding: 0;
+    }
+
+    .footer-section h4 {
+        font-size: 16px;
+        margin-bottom: 12px;
+    }
+
+    .footer-section ul li {
+        margin-bottom: 8px;
+    }
+
+    .footer-section ul li a {
+        font-size: 14px;
+    }
+
+    /* First section spans 2 columns */
+    .footer-section:first-child {
+        grid-column: 1 / -1;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .footer-section:first-child p {
+        font-size: 14px;
+    }
+}
+
+/* Ultra-small screens */
+@media (max-width: 480px) {
+    .footer-content {
+        grid-template-columns: 1fr 1fr; /* Keep 2 columns */
+        gap: 25px;
+    }
+}
