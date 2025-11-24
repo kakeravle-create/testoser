@@ -404,33 +404,20 @@ body {
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
-
-/* ====================================
-   MOBILE NAVIGATION (Hamburger Menu)
-   ==================================== */
-
 /* ====================================
    MOBILE NAVIGATION (Hamburger Menu)
    ==================================== */
 
 .mobile-menu-toggle {
     display: none;
-    background: rgba(0, 0, 0, 0.2);  /* Dark semi-transparent background */
-    border: 2px solid rgba(255, 255, 255, 0.8);  /* White border */
-    border-radius: 8px;
-    font-size: 32px;
+    background: none;
+    border: none;
+    font-size: 28px;
     color: white;
     cursor: pointer;
-    padding: 10px 14px;
+    padding: 8px;
     position: relative;
     z-index: 1001;
-    backdrop-filter: blur(5px);  /* Glass effect */
-    transition: all 0.2s ease;
-}
-
-.mobile-menu-toggle:active {
-    transform: scale(0.95);
-    background: rgba(0, 0, 0, 0.4);
 }
 
 @media (max-width: 768px) {
@@ -438,7 +425,7 @@ body {
     .mobile-menu-toggle {
         display: block;
         color: white !important;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     /* Hide nav links by default on mobile */
@@ -480,7 +467,6 @@ body {
         text-align: center !important;
     }
 }
-
 
 /* ====================================
    IMPROVED MOBILE FOOTER
