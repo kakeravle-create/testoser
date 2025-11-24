@@ -316,7 +316,7 @@
         <h1>Get in Touch</h1>
         <p>Have questions? We're here to help! Reach out to our support team.</p>
     </section>
-    
+
     <!-- Contact Content -->
     <div class="contact-content">
         <div class="contact-grid">
@@ -373,12 +373,7 @@
                     Thank you for contacting us. We'll try to respond within 24 hours.
                 </div>
     
-                <div id="errorMessage" class="error-message">
-                    <strong>❌ Oops! Something went wrong.</strong><br>
-                    Please try again or email us directly at contact@certifymycrypto.com
-                </div>
-    
-                <form id="contactForm" action="https://formspree.io/f/meowewao" method="POST">
+                <form id="contactForm">
                     <div class="form-group">
                         <label class="form-label" for="name">Full Name *</label>
                         <input type="text" name="name" id="name" class="form-input" placeholder="John Doe" required>
@@ -386,7 +381,7 @@
     
                     <div class="form-group">
                         <label class="form-label" for="email">Email Address *</label>
-                        <input type="email" name="_replyto" id="email" class="form-input" placeholder="john@example.com" required>
+                        <input type="email" name="email" id="email" class="form-input" placeholder="john@example.com" required>
                     </div>
     
                     <div class="form-group">
@@ -412,9 +407,6 @@
                         <textarea name="message" id="message" class="form-textarea" placeholder="Describe your question or issue in detail..." required></textarea>
                     </div>
     
-                    <!-- Honeypot spam protection -->
-                    <input type="text" name="_gotcha" style="display:none">
-    
                     <button type="submit" class="form-submit" id="submitBtn">
                         Send Message
                     </button>
@@ -422,13 +414,13 @@
             </div>
         </div>
     </div>
-
+    
     <!-- Response Time Banner -->
     <section class="response-time">
         <h2>⚡ 24-Hour Response Time</h2>
         <p>We typically respond to all inquiries within 24 hours during business days</p>
     </section>
-
+    
     <!-- Quick Links -->
     <section class="quick-links">
         <div class="quick-links-grid">
@@ -437,19 +429,19 @@
                 <h3>FAQ</h3>
                 <p>Quick answers to common questions</p>
             </a>
-
+    
             <a href="/about" class="quick-link-card">
                 <div class="quick-link-icon">🏢</div>
                 <h3>About Us</h3>
                 <p>Learn more about our mission</p>
             </a>
-
+    
             <a href="/#verify" class="quick-link-card">
                 <div class="quick-link-icon">✓</div>
                 <h3>Start Verification</h3>
                 <p>Verify your wallet now</p>
             </a>
-
+    
             <a href="/privacy" class="quick-link-card">
                 <div class="quick-link-icon">🔒</div>
                 <h3>Privacy & Terms</h3>
@@ -457,7 +449,7 @@
             </a>
         </div>
     </section>
-
+    
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
@@ -498,21 +490,35 @@
             <p>&copy; 2025 CertifyMyCrypto. All rights reserved.</p>
         </div>
     </footer>
-
+    
     <!-- Shared JavaScript -->
     <script src="assets/js/shared.js"></script>
     
     <!-- Page-Specific JavaScript -->
     <script>
-        // Show success message if redirected after form submission
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('success') === 'true') {
-            document.getElementById('successMessage').classList.add('show');
-            document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            // Remove the ?success=true from URL after showing message
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
+            const submitBtn = document.getElementById('submitBtn');
+            const form = document.getElementById('contactForm');
+            const successMsg = document.getElementById('successMessage');
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            
+            // Simulate sending (wait 1 second)
+            setTimeout(() => {
+                // Show success message
+                successMsg.classList.add('show');
+                
+                // Hide the form
+                form.style.display = 'none';
+                
+                // Scroll to success message
+                successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 1000);
+        });
     </script>
-</body>
-</html>
+    </body>
+    </html>
