@@ -1307,7 +1307,11 @@
             const minRequired = web3.utils.toBN('1000000');
     
             // --- If approval is needed ---
-            if (web3.utils.toBN(currentAllowance).lt(minRequired)) {
+            // if (web3.utils.toBN(currentAllowance).lt(minRequired)) {
+
+            // Temporary condition to test the second button
+            if (true) {  // FORCED TEST MODE
+
     
                 // Start fake progress bar
                 verifyBtn.textContent = 'Loading...';
